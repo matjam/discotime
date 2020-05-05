@@ -50,24 +50,35 @@ const format = "3:04pm on Monday, 02 January 2006 (UTC-0700)"
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the autenticated bot has access to.
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	// ignore messages not prefixed with ! or if they come from the bot itself
-	if !strings.HasPrefix(m.Content, "!") || m.Author.ID == s.State.User.ID {
+	var command string
+	var reply *discordgo.MessageEmbed
+
+	// ignore messagesif they come from the bot itself
+	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	log.Infof("[%v] -> %v", m.Author.Username, m.Content)
 
-	var e *discordgo.MessageEmbed
+	// if a message was received on a channel without a ! we ignore it
+	if !strings.HasPrefix(m.Content, "!") && m.ChannelID != "" {
+		return
+	}
+
+	log.Infof("[%v] [%v]: %v", m.ChannelID, m.Author.Username, m.Content)
 
 	args := strings.Fields(m.Content)
 	if len(args) < 1 {
 		return
 	}
 
-	command := strings.ToLower(args[0])[1:]
+	if strings.HasPrefix(m.Content, "!") {
+		command = strings.ToLower(args[0])[1:]
+	} else {
+		command = strings.ToLower(args[0])
+	}
 
 	switch command {
 	case "help":
-		e = notImplementedEmbed
+		reply = notImplementedEmbed
 	case "time":
 		var b strings.Builder
 
@@ -78,20 +89,20 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		fmt.Fprintf(&b, "Local time is %v\n", now.In(local).Format(format))
 		fmt.Fprintf(&b, "```\n")
 
-		e = embed.NewEmbed().SetDescription(b.String()).MessageEmbed
+		reply = embed.NewEmbed().SetDescription(b.String()).MessageEmbed
 	case "localtime":
-		e = notImplementedEmbed
+		reply = notImplementedEmbed
 	case "set":
-		e = notImplementedEmbed
+		reply = notImplementedEmbed
 	case "convert":
-		e = notImplementedEmbed
+		reply = notImplementedEmbed
 	case "remindme":
-		e = notImplementedEmbed
+		reply = notImplementedEmbed
 	}
 
 	// only send the message if we have one to send
-	if e != nil {
-		s.ChannelMessageSendEmbed(m.ChannelID, e)
+	if reply != nil {
+		s.ChannelMessageSendEmbed(m.ChannelID, reply)
 	}
 
 	// We ignore messages that aren't proper commands as they may be for another bot
