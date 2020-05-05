@@ -61,7 +61,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if len(args) < 1 {
 		return
 	}
-	switch strings.ToLower(args[0]) {
+
+	command := strings.ToLower(args[0])[1:]
+
+	switch command {
 	case "help":
 		e = notImplementedEmbed
 	case "time":
