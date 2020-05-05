@@ -5,6 +5,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	embed "github.com/Clinet/discordgo-embed"
 	"github.com/bwmarrin/discordgo"
@@ -59,6 +60,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case "help":
 		e = embed.NewGenericEmbed("Usage", "Supported commands:\n"+
 			" * time now - get the current time in UTC")
+	case "time":
+		now := time.Now()
+		e = embed.NewGenericEmbed("Time now UTC:", now.Format(time.RFC1123Z))
 	default:
 		e = embed.NewErrorEmbed("Huh?", "Sorry, I don't understand that.")
 	}
