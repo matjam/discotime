@@ -15,7 +15,11 @@ func main() {
 	port := os.Getenv("PORT")
 	token := os.Getenv("DISCORD_AUTH")
 
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	log.Logger = log.Output(zerolog.ConsoleWriter{
+		Out:        os.Stderr,
+		NoColor:    true,
+		TimeFormat: ""},
+	)
 
 	// Echo instance
 	e := echo.New()
