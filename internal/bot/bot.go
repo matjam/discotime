@@ -45,7 +45,7 @@ func Run(token string) {
 
 var notImplementedEmbed = embed.NewGenericEmbed("Not Implemented", "```\nnot yet implemented.\n```")
 
-const format = "*3:04pm* on *Monday, 02 January 2006* (UTC-0700)"
+const format = "**3:04pm** on **Monday, 02 January 2006** (UTC-0700)"
 
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the autenticated bot has access to.
