@@ -13,6 +13,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+func formatQuotedMessage(i interface{}) string {
+	if s, ok := i.(string); ok {
+		return fmt.Sprintf("\"%s\"", strings.ReplaceAll(s, "\"", "\\\""))
+	}
+
+	return fmt.Sprintf("%s", i)
+}
+
 func main() {
 	port := os.Getenv("PORT")
 	token := os.Getenv("DISCORD_AUTH")
@@ -21,15 +29,11 @@ func main() {
 		Out:        os.Stderr,
 		NoColor:    true,
 		TimeFormat: ""}
-	out.FormatLevel = func(i interface{}) string { return strings.ToUpper(fmt.Sprintf("%-6s|", i)) }
+	out.FormatMessage = formatQuotedMessage
+	out.FormatTimestamp = func(i interface{}) string { return "" }
+	out.FormatLevel = func(i interface{}) string { return fmt.Sprintf("level=%s", i) }
 	out.FormatFieldName = func(i interface{}) string { return fmt.Sprintf("%s=", i) }
-	out.FormatFieldValue = func(i interface{}) string {
-		if s, ok := i.(string); ok {
-			return fmt.Sprintf("\"%s\"", strings.ReplaceAll(s, "\"", "\\\""))
-		}
-
-		return fmt.Sprintf("%s", i)
-	}
+	out.FormatFieldValue = formatQuotedMessage
 	log.Logger = log.Output(out)
 
 	// Echo instance
