@@ -1,3 +1,4 @@
+from redis_client import Redis
 from discord.ext import commands
 from os import getenv
 from datetime import datetime
@@ -7,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 bot = commands.Bot(command_prefix="!", description="A bot that converts timezones.")
+redis = Redis()
 
 
 @bot.event
@@ -27,7 +29,8 @@ def main():
         level=logging.INFO,
     )
 
-    logging.info("Started")
+    logging.info("Starting")
+
     bot.run(getenv("DISCORD_AUTH"))
     logging.info("Finished")
 
