@@ -1,1 +1,1 @@
-worker: python -m discotime
+worker: python bot.py
