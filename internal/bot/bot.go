@@ -9,12 +9,6 @@ import (
 	embed "github.com/Clinet/discordgo-embed"
 	"github.com/bwmarrin/discordgo"
 	"github.com/labstack/gommon/log"
-	"gopkg.in/alecthomas/kingpin.v2"
-)
-
-var (
-	bot  = kingpin.New("discotime", "A Discord bot to help you with timezone conversions.")
-	help = kingpin.Command("help", "Show the help for this bot.")
 )
 
 // Run will start the discord bot
@@ -50,27 +44,25 @@ func Run(token string) {
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the autenticated bot has access to.
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.GuildID != "" {
+	if m.GuildID != "" || m.Author.ID == s.State.User.ID {
 		return
 	}
 	log.Infof("[%v] -> %v", m.Author.Username, m.Content)
 
-	// Ignore all messages created by the bot itself
-	if m.Author.ID == s.State.User.ID {
+	var e *discordgo.MessageEmbed
+
+	args := strings.Fields(m.Content)
+	if len(args) < 1 {
 		return
 	}
-
-	cmd, err := bot.Parse(strings.Fields(m.Content))
-	if err != nil {
-		s.ChannelMessageSendEmbed(m.ChannelID, embed.NewErrorEmbed("Error processing your command", err.Error()))
-	}
-	switch cmd {
+	switch args[0] {
 	case "help":
-		s.ChannelMessageSendEmbed(m.ChannelID, embed.NewGenericEmbed("Usage",
-			`This bot understads the following commands:
-				halp
-		
-		`))
+		e = embed.NewGenericEmbed("Usage", "Supported commands:\n"+
+			" * time now - get the current time in UTC")
+	default:
+		e = embed.NewErrorEmbed("Huh?", "Sorry, I don't understand that.")
 	}
+
+	s.ChannelMessageSendEmbed(m.ChannelID, e)
 
 }
