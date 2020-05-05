@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -15,11 +17,20 @@ func main() {
 	port := os.Getenv("PORT")
 	token := os.Getenv("DISCORD_AUTH")
 
-	log.Logger = log.Output(zerolog.ConsoleWriter{
+	out := zerolog.ConsoleWriter{
 		Out:        os.Stderr,
 		NoColor:    true,
-		TimeFormat: ""},
-	)
+		TimeFormat: ""}
+	out.FormatLevel = func(i interface{}) string { return strings.ToUpper(fmt.Sprintf("%-6s|", i)) }
+	out.FormatFieldName = func(i interface{}) string { return fmt.Sprintf("%s=", i) }
+	out.FormatFieldValue = func(i interface{}) string {
+		if s, ok := i.(string); ok {
+			return fmt.Sprintf("\"%s\"", strings.ReplaceAll(s, "\"", "\\\""))
+		}
+
+		return fmt.Sprintf("%s", i)
+	}
+	log.Logger = log.Output(out)
 
 	// Echo instance
 	e := echo.New()
