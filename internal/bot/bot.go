@@ -53,13 +53,23 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var command string
 	var reply *discordgo.MessageEmbed
 
+	channel, err := s.Channel(m.ChannelID)
+	if err != nil {
+		log.Errorf("unable to get channel: %v", err.Error())
+	}
+
+	// We only handle messages from channels and DMs.
+	if channel.Type != discordgo.ChannelTypeDM && channel.Type != discordgo.ChannelTypeGuildText {
+		return
+	}
+
 	// ignore messagesif they come from the bot itself
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
 
 	// if a message was received on a channel without a ! we ignore it
-	if !strings.HasPrefix(m.Content, "!") && m.ChannelID != "" {
+	if !strings.HasPrefix(m.Content, "!") && channel.Type == discordgo.ChannelTypeGuildText {
 		return
 	}
 
@@ -70,6 +80,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	// strip the bang
 	if strings.HasPrefix(m.Content, "!") {
 		command = strings.ToLower(args[0])[1:]
 	} else {
