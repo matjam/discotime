@@ -78,7 +78,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		fmt.Fprintf(&b, "Local time is %v\n", now.In(local).Format(format))
 		fmt.Fprintf(&b, "```\n")
 
-		e = embed.NewGenericEmbed("Current Time UTC", b.String())
+		e = embed.NewEmbed().SetDescription(b.String()).MessageEmbed
 	case "localtime":
 		e = notImplementedEmbed
 	case "set":
