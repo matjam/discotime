@@ -10,16 +10,16 @@ import (
 
 	embed "github.com/Clinet/discordgo-embed"
 	"github.com/bwmarrin/discordgo"
-	"github.com/labstack/gommon/log"
+	"github.com/rs/zerolog/log"
 )
 
 // Run will start the discord bot
 func Run(token string) {
-	log.Info("starting discord bot")
+	log.Info().Msg("starting discord bot")
 	// Create a new Discord session using the provided bot token.
 	dg, err := discordgo.New("Bot " + token)
 	if err != nil {
-		log.Errorf("error creating Discord session,", err)
+		log.Error().Msgf("error creating Discord session: %v", err.Error())
 		return
 	}
 
@@ -29,11 +29,11 @@ func Run(token string) {
 	// Open a websocket connection to Discord and begin listening.
 	err = dg.Open()
 	if err != nil {
-		log.Errorf("error opening connection,", err)
+		log.Error().Msgf("error opening connection: %v", err.Error())
 		return
 	}
 
-	log.Info("Bot is now running.")
+	log.Info().Msg("Bot is now running.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
@@ -55,7 +55,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	channel, err := s.Channel(m.ChannelID)
 	if err != nil {
-		log.Errorf("unable to get channel: %v", err.Error())
+		log.Error().Msgf("unable to get channel: %v", err.Error())
 	}
 
 	// We only handle messages from channels and DMs.
@@ -73,7 +73,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	log.Infof("[%v] [%v]: %v", m.ChannelID, m.Author.Username, m.Content)
+	log.Info().Msgf("[%v] [%v]: %v", m.ChannelID, m.Author.Username, m.Content)
 
 	args := strings.Fields(m.Content)
 	if len(args) < 1 {
