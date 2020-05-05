@@ -21,10 +21,7 @@ func formatQuotedMessage(i interface{}) string {
 	return fmt.Sprintf("%s", i)
 }
 
-func main() {
-	port := os.Getenv("PORT")
-	token := os.Getenv("DISCORD_AUTH")
-
+func initLogging() {
 	out := zerolog.ConsoleWriter{
 		Out:        os.Stderr,
 		NoColor:    true,
@@ -35,6 +32,13 @@ func main() {
 	out.FormatFieldName = func(i interface{}) string { return fmt.Sprintf("%s=", i) }
 	out.FormatFieldValue = formatQuotedMessage
 	log.Logger = log.Output(out)
+}
+
+func main() {
+	port := os.Getenv("PORT")
+	token := os.Getenv("DISCORD_AUTH")
+
+	initLogging()
 
 	// Echo instance
 	e := echo.New()
@@ -45,7 +49,7 @@ func main() {
 
 	// Route => handler
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!\n")
+		return c.Redirect(http.StatusTemporaryRedirect, "https://github.com/matjam/discotime")
 	})
 
 	go bot.Run(token)
