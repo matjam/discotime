@@ -50,6 +50,9 @@ func Run(token string) {
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the autenticated bot has access to.
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.GuildID != "" {
+		return
+	}
 	log.Infof("[%v] -> %v", m.Author.Username, m.Content)
 
 	// Ignore all messages created by the bot itself
@@ -59,7 +62,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	cmd, err := bot.Parse(strings.Fields(m.Content))
 	if err != nil {
-		s.ChannelMessageSendEmbed(m.ChannelID, embed.NewErrorEmbed("Example Error", err.Error()))
+		s.ChannelMessageSendEmbed(m.ChannelID, embed.NewErrorEmbed("Error processing your command", err.Error()))
 	}
 	switch cmd {
 	case "help":
