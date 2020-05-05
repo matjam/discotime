@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/matjam/discotime/internal/bot"
 )
 
@@ -17,6 +18,9 @@ func main() {
 	e := echo.New()
 	e.HideBanner = true
 	e.Logger.SetLevel(99)
+	if l, ok := e.Logger.(*log.Logger); ok {
+		l.SetHeader("${time_rfc3339} ${level}")
+	}
 
 	// Middleware
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
