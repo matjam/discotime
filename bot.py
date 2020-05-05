@@ -3,7 +3,7 @@ from discord.ext import commands
 from os import getenv
 from datetime import datetime
 import logging
-import asyncio
+from asyncio import get_event_loop
 
 logger = logging.getLogger(__name__)
 bot = commands.Bot(command_prefix="!", description="A bot that converts timezones.")
@@ -31,10 +31,16 @@ async def main():
 
     # and having to know this is async is why this sucks
     await Redis.connect(getenv("REDIS_URL"))
-    bot.run(getenv("DISCORD_AUTH"))
+
+    try:
+        bot.start(getenv("DISCORD_AUTH"))
+    except Exception as e:
+        bot.close()
+        raise e
 
     logging.info("Finished")
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    loop = get_event_loop()
+    loop.run_until_complete(main())
