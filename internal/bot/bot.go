@@ -95,8 +95,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		now := time.Now()
 		local, _ := time.LoadLocation("America/Los_Angeles")
-		fmt.Fprintf(&b, "The current time is %v\n", now.Format(format))
-		fmt.Fprintf(&b, "Your local time is %v", now.In(local).Format(format))
+		fmt.Fprintf(&b, "The current UTC time is %v\n", now.Format(format))
+		fmt.Fprintf(&b, "Your current LOCAL time is %v", now.In(local).Format(format))
 
 		reply = embed.NewEmbed().SetDescription(b.String()).MessageEmbed
 	case "localtime":
