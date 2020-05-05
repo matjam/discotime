@@ -42,10 +42,15 @@ func Run(token string) {
 
 }
 
+var notImplementedEmbed = embed.NewGenericEmbed("Not Implemented", "```\nnot yet implemented.\n```")
+
+const format = "3:04pm on Monday, 02 January 2006 MST (UTC-0700)"
+
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the autenticated bot has access to.
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.GuildID != "" || m.Author.ID == s.State.User.ID {
+	// ignore messages not prefixed with ! or if they come from the bot itself
+	if !strings.HasPrefix(m.Content, "!") || m.Author.ID == s.State.User.ID {
 		return
 	}
 	log.Infof("[%v] -> %v", m.Author.Username, m.Content)
@@ -56,17 +61,26 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if len(args) < 1 {
 		return
 	}
-	switch args[0] {
+	switch strings.ToLower(args[0]) {
 	case "help":
-		e = embed.NewGenericEmbed("Usage", "Supported commands:\n"+
-			" * time now - get the current time in UTC")
+		e = notImplementedEmbed
 	case "time":
 		now := time.Now()
-		e = embed.NewGenericEmbed("Time now UTC:", now.Format(time.RFC1123Z))
-	default:
-		e = embed.NewErrorEmbed("Huh?", "Sorry, I don't understand that.")
+		e = embed.NewGenericEmbed("Current Time UTC", now.Format(format))
+	case "localtime":
+		e = notImplementedEmbed
+	case "set":
+		e = notImplementedEmbed
+	case "convert":
+		e = notImplementedEmbed
+	case "remindme":
+		e = notImplementedEmbed
 	}
 
-	s.ChannelMessageSendEmbed(m.ChannelID, e)
+	// only send the message if we have one to send
+	if e != nil {
+		s.ChannelMessageSendEmbed(m.ChannelID, e)
+	}
 
+	// We ignore messages that aren't proper commands as they may be for another bot
 }
