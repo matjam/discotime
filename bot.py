@@ -6,10 +6,7 @@ import logging
 import asyncio
 
 logger = logging.getLogger(__name__)
-
-
 bot = commands.Bot(command_prefix="!", description="A bot that converts timezones.")
-redis = Redis()
 
 
 @bot.event
@@ -31,7 +28,11 @@ async def main():
     )
 
     logging.info("Starting")
+
+    # and having to know this is async is why this sucks
+    await Redis.connect(getenv("REDIS_URL"))
     bot.run(getenv("DISCORD_AUTH"))
+
     logging.info("Finished")
 
 

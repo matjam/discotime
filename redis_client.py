@@ -3,10 +3,12 @@ from os import getenv
 
 
 class Redis:
-    redis = None
+    client = None
 
-    def __init__(self):
-        self.redis = await aioredis.create_redis_pool(getenv("REDIS_URL"))
+    @classmethod
+    async def connect(cls, url):
+        cls.client = await aioredis.create_redis_pool(url)
 
-    def get_client(self):
-        return self.redis
+    @classmethod
+    def get(cls):
+        return cls.client
