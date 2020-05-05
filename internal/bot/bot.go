@@ -73,7 +73,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	log.Info().Str("channel_id", m.ChannelID).Str("username", m.Author.Username).Str("content", m.Content)
+	log.Info().Str("channel_id", m.ChannelID).Str("username", m.Author.Username).Str("content", m.Content).Send()
 
 	args := strings.Fields(m.Content)
 	if len(args) < 1 {
