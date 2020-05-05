@@ -8,7 +8,6 @@ import (
 
 	embed "github.com/Clinet/discordgo-embed"
 	"github.com/bwmarrin/discordgo"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/gommon/log"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -51,7 +50,7 @@ func Run(token string) {
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the autenticated bot has access to.
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	log.Info(spew.Sdump(m))
+	log.Infof("[%v] -> %v", m.Author.Username, m.Content)
 
 	// Ignore all messages created by the bot itself
 	if m.Author.ID == s.State.User.ID {
