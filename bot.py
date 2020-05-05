@@ -3,6 +3,7 @@ from discord.ext import commands
 from os import getenv
 from datetime import datetime
 import logging
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -23,17 +24,16 @@ async def time(ctx):
     await ctx.send(current_time)
 
 
-def main():
+async def main():
     logging.basicConfig(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         level=logging.INFO,
     )
 
     logging.info("Starting")
-
     bot.run(getenv("DISCORD_AUTH"))
     logging.info("Finished")
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
