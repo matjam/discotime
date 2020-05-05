@@ -2,12 +2,15 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
 func main() {
+	port := os.Getenv("PORT")
+
 	// Echo instance
 	e := echo.New()
 
@@ -21,5 +24,5 @@ func main() {
 	})
 
 	// Start server
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":" + port))
 }
