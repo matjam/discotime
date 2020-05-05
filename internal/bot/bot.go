@@ -96,3 +96,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// We ignore messages that aren't proper commands as they may be for another bot
 }
+
+func setTimezone() {
+
+}

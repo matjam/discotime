@@ -16,7 +16,8 @@ You can view a list of canonical timezones at https://en.wikipedia.org/wiki/List
 
 ```
 >>> !set America/Los_Angeles
-tzbot: ok, your timezone is now set to America/Los_Angeles. I will assume this is your local timezone when I convert a time to your local time.
+tzbot: ok, your timezone is now set to America/Los_Angeles.
+tzbot: I will assume this is your local timezone when I convert a time to your local time.
 ```
 
 ## Automatically guess your timezone based on your channel nickname.
@@ -29,7 +30,7 @@ tzbot: That time is 3:54pm on Tuesday, 05 May 2020 UTC (UTC+0000)
 tzbot: Local time is 8:54am on Tuesday, 05 May 2020 PDT (UTC-0700)
 ```
 
-This allows people who
+This allows people who have yet to set a timezone but have it in their nickname to take advantage of the bot.
 
 ## Convert time from one timezone to another.
 
