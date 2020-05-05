@@ -3,6 +3,9 @@ from os import getenv
 from datetime import datetime
 import logging
 
+logger = logging.getLogger(__name__)
+
+
 bot = commands.Bot(command_prefix="!", description="A bot that converts timezones.")
 
 
@@ -18,6 +21,16 @@ async def time(ctx):
     await ctx.send(current_time)
 
 
-logging.info("starting discotime")
+def main():
+    logging.basicConfig(
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        level=logging.INFO,
+    )
 
-bot.run(getenv("DISCORD_AUTH"))
+    logging.info("Started")
+    bot.run(getenv("DISCORD_AUTH"))
+    logging.info("Finished")
+
+
+if __name__ == "__main__":
+    main()
