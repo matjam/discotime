@@ -3,11 +3,19 @@ package bot
 import (
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
+	embed "github.com/Clinet/discordgo-embed"
 	"github.com/bwmarrin/discordgo"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/gommon/log"
+	"gopkg.in/alecthomas/kingpin.v2"
+)
+
+var (
+	bot  = kingpin.New("discotime", "A Discord bot to help you with timezone conversions.")
+	help = kingpin.Command("help", "Show the help for this bot.")
 )
 
 // Run will start the discord bot
@@ -19,6 +27,7 @@ func Run(token string) {
 		log.Errorf("error creating Discord session,", err)
 		return
 	}
+
 	// Register the messageCreate func as a callback for MessageCreate events.
 	dg.AddHandler(messageCreate)
 
@@ -45,17 +54,21 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	log.Info(spew.Sdump(m))
 
 	// Ignore all messages created by the bot itself
-	// This isn't required in this specific example but it's a good practice.
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	// If the message is "ping" reply with "Pong!"
-	if m.Content == "ping" {
-		s.ChannelMessageSend(m.ChannelID, "Pong!")
+
+	cmd, err := bot.Parse(strings.Fields(m.Content))
+	if err != nil {
+		s.ChannelMessageSendEmbed(m.ChannelID, embed.NewErrorEmbed("Example Error", err.Error()))
+	}
+	switch cmd {
+	case "help":
+		s.ChannelMessageSendEmbed(m.ChannelID, embed.NewGenericEmbed("Usage",
+			`This bot understads the following commands:
+				halp
+		
+		`))
 	}
 
-	// If the message is "pong" reply with "Ping!"
-	if m.Content == "pong" {
-		s.ChannelMessageSend(m.ChannelID, "Ping!")
-	}
 }
