@@ -45,7 +45,7 @@ func Run(token string) {
 
 var notImplementedEmbed = embed.NewGenericEmbed("Not Implemented", "```\nnot yet implemented.\n```")
 
-const format = "3:04pm on Monday, 02 January 2006 MST (UTC-0700)"
+const format = "3:04pm on Monday, 02 January 2006 (UTC-0700)"
 
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the autenticated bot has access to.
@@ -69,8 +69,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case "help":
 		e = notImplementedEmbed
 	case "time":
+		var b strings.Builder
+
 		now := time.Now()
-		e = embed.NewGenericEmbed("Current Time UTC", fmt.Sprintf("```\n%v\n```", now.Format(format)))
+		local, _ := time.LoadLocation("America/Los_Angeles")
+		fmt.Fprintf(&b, "```\n")
+		fmt.Fprintf(&b, "The current time is %v\n", now.Format(format))
+		fmt.Fprintf(&b, "Local time is %v\n", now.In(local).Format(format))
+		fmt.Fprintf(&b, "```\n")
+
+		e = embed.NewGenericEmbed("Current Time UTC", b.String())
 	case "localtime":
 		e = notImplementedEmbed
 	case "set":
