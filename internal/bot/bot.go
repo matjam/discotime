@@ -53,9 +53,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var command string
 	var reply *discordgo.MessageEmbed
 
+	sublogger := log.With().Str("channel_id", m.ChannelID).Str("username", m.Author.Username).Str("content", m.Content).Logger()
+
 	channel, err := s.Channel(m.ChannelID)
 	if err != nil {
-		log.Error().Msgf("unable to get channel: %v", err.Error())
+		sublogger.Error().Msgf("unable to get channel: %v", err.Error())
 	}
 
 	// We only handle messages from channels and DMs.
@@ -73,8 +75,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	log.Info().Str("channel_id", m.ChannelID).Str("username", m.Author.Username).Str("content", m.Content).Send()
-
 	args := strings.Fields(m.Content)
 	if len(args) < 1 {
 		return
@@ -86,6 +86,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	} else {
 		command = strings.ToLower(args[0])
 	}
+
+	sublogger.Info().Msgf("processing command")
 
 	switch command {
 	case "help":

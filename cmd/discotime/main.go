@@ -31,7 +31,7 @@ func initLogging() {
 			return fmt.Sprintf("message=%v", formatQuotedMessage(i))
 		}
 
-		return ""
+		return "message=\"\""
 	}
 	out.FormatTimestamp = func(i interface{}) string { return "" }
 	out.FormatLevel = func(i interface{}) string { return fmt.Sprintf("level=%s", i) }
