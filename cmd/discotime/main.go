@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/matjam/discotime/internal/bot"
 )
 
@@ -15,6 +16,11 @@ func main() {
 
 	// Echo instance
 	e := echo.New()
+
+	// log format - only need the level as Heroku stamps it with time/date
+	if l, ok := e.Logger.(*log.Logger); ok {
+		l.SetHeader("${level} ${short_file}:${line}")
+	}
 
 	// Middleware
 	e.Use(middleware.Logger())
