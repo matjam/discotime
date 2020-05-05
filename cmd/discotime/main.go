@@ -26,7 +26,13 @@ func initLogging() {
 		Out:        os.Stderr,
 		NoColor:    true,
 		TimeFormat: ""}
-	out.FormatMessage = func(i interface{}) string { return fmt.Sprintf("message=%v", formatQuotedMessage(i)) }
+	out.FormatMessage = func(i interface{}) string {
+		if i != nil {
+			return fmt.Sprintf("message=%v", formatQuotedMessage(i))
+		}
+
+		return ""
+	}
 	out.FormatTimestamp = func(i interface{}) string { return "" }
 	out.FormatLevel = func(i interface{}) string { return fmt.Sprintf("level=%s", i) }
 	out.FormatFieldName = func(i interface{}) string { return fmt.Sprintf("%s=", i) }
