@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"strings"
@@ -69,7 +70,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		e = notImplementedEmbed
 	case "time":
 		now := time.Now()
-		e = embed.NewGenericEmbed("Current Time UTC", now.Format(format))
+		e = embed.NewGenericEmbed("Current Time UTC", fmt.Sprintf("```\n%v\n```", now.Format(format)))
 	case "localtime":
 		e = notImplementedEmbed
 	case "set":
