@@ -1,5 +1,4 @@
 import aioredis
-from os import getenv
 
 
 class Redis:
