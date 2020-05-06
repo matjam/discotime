@@ -85,7 +85,7 @@ tzbot: Which is 3:54pm on Tuesday, 05 May 2020 UTC (UTC+0000)
 You can ask the bot to private message you at a specific time in UTC. If you give it no offset or timzeone it will use the configured timezone that you set earlier, and failing that it will try to use guess based on your in-server nickname:
 
 ```
->>> !remindme tomorrow at 11:30pm
+>>> !remindme 2020-05-06 23:30
 tzbot: That time is 11:30pm on Wednesday, 06 May 2020 UTC (UTC+0000)
 tzbot: I will remind you at 4:30pm on Wednesday, 06 May 2020 PDT (UTC-0700)
 ```
@@ -102,29 +102,11 @@ tzbit: I will remind you at 8:30am on Wednesday, 06 May 2020 PDT (UTC-0700)
 
 ## Natural Language Dates
 
-In order to try and be more user friendly, we try to parse the date/time provided using https://github.com/tj/go-naturaldate
+I really tried to support natural language dates, but none of the go libraries were really up to the task.
 
-For example, the following should be possible:
+So, instead, I am using https://github.com/araddon/dateparse which has a list of formats that it supports. Which is a lot. Many may not give you what you're looking for; so you just have to find one that works for you.
 
-* now
-* today
-* yesterday
-* 5 minutes ago
-* three days ago
-* last month
-* next month
-* one year from now
-* yesterday at 10am
-* last sunday at 5:30pm
-* sunday at 22:45
-* next January
-* last February
-* December 25th at 7:30am
-* 10am
-* 10:05pm
-* 10:05:22pm
-* 5 days from now
-* 25th of December at 7:30am
+My personal recommendation, is to use the `2013-04-01 22:43` format. It's completely unambiguous and pretty much everyone understands it. But you can potentially use any of the formats on the dateparse page.
 
 # Adding the bot to your Discord server
 

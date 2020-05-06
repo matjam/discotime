@@ -8,12 +8,15 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/matjam/discotime/internal/cache"
-	naturaldate "github.com/tj/go-naturaldate"
-
+	"github.com/araddon/dateparse"
 	"github.com/bwmarrin/discordgo"
+	"github.com/matjam/discotime/internal/cache"
+	"github.com/olebedev/when"
+	"github.com/olebedev/when/rules/common"
+	"github.com/olebedev/when/rules/en"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	naturaldate "github.com/tj/go-naturaldate"
 )
 
 // Run will start the discord bot
@@ -189,6 +192,10 @@ func (ctx *discordContext) log() *zerolog.Logger {
 }
 
 func (ctx *discordContext) localTime(args []string) {
+	w := when.New(nil)
+	w.Add(en.All...)
+	w.Add(common.All...)
+
 	location := cache.GetUserLocation(ctx.userID)
 	if location == nil {
 		ctx.reply("Sorry, I don't have any configured timezone for you. Try `set`.")
@@ -197,12 +204,30 @@ func (ctx *discordContext) localTime(args []string) {
 
 	timeString := strings.Join(args[:], " ")
 	r, err := naturaldate.Parse(timeString, time.Now())
-	if err != nil {
-		ctx.reply("Sorry, I didn't understand that time/date.")
-		ctx.log().Error().Msgf("parse error: %v", err.Error())
+	if err == nil {
+		ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Format(format)))
+		ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.In(location).Format(format)))
+		return
+	}
+	ctx.log().Error().Msgf("naturaldate parse error: %v", err.Error())
+
+	r, err = dateparse.ParseStrict(timeString)
+	if err == nil {
+		ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Format(format)))
+		ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.In(location).Format(format)))
+		return
+	}
+	ctx.log().Error().Msgf("dateparse parse error: %v", err.Error())
+
+	wr, err := w.Parse(timeString, time.Now())
+	if err == nil {
+		r = wr.Time
+		ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Format(format)))
+		ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.In(location).Format(format)))
 		return
 	}
 
-	ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Format(format)))
-	ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.In(location).Format(format)))
+	ctx.reply("Sorry, I didn't understand that time/date. I really tried. " +
+		"Maybe use something I can understand, like `YYYY-MM-DD HH:MM` in 24 hour " +
+		"time? I can probably handle that.")
 }

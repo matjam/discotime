@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -48,6 +49,12 @@ func main() {
 	// Initialize some global stuff
 	initLogging()
 	cache.InitCache()
+
+	loc, err := time.LoadLocation("UTC")
+	if err != nil {
+		panic(err.Error())
+	}
+	time.Local = loc
 
 	// Echo instance
 	e := echo.New()
