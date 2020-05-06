@@ -91,6 +91,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	sublogger.Info().Msgf("processing command")
 	ctx := discordContext{
 		session:   s,
+		user:      m.Member.User,
 		userID:    userID,
 		channelID: m.ChannelID,
 		logCtx:    &sublogger,
@@ -123,6 +124,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 type discordContext struct {
 	session   *discordgo.Session
+	user      *discordgo.User
 	userID    string
 	channelID string
 	logCtx    *zerolog.Logger
@@ -167,7 +169,8 @@ func (ctx *discordContext) getTime() {
 }
 
 func (ctx *discordContext) reply(message string) {
-	msg := fmt.Sprintf("@%v %v", ctx.userID, message)
+	mention := ctx.user.Mention()
+	msg := fmt.Sprintf("%v %v", mention, message)
 	_, err := ctx.session.ChannelMessageSend(ctx.channelID, msg)
 	if err != nil {
 		ctx.log().Error().Msgf("error sending message to Discord: %v", err.Error())
