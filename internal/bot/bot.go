@@ -196,7 +196,7 @@ func (ctx *discordContext) localTime(args []string) {
 	}
 
 	timeString := strings.Join(args[:], " ")
-	r, err := naturaldate.Parse(timeString, time.Now(), naturaldate.WithDirection(naturaldate.Future))
+	r, err := naturaldate.Parse(timeString, time.Now())
 	if err != nil {
 		ctx.reply("Sorry, I didn't understand that time/date.")
 		ctx.log().Error().Msgf("parse error: %v", err.Error())
