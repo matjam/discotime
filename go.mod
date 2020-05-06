@@ -10,6 +10,8 @@ require (
 	github.com/clinet/discordgo-embed v0.0.0-20190411043415-d754bc1a576c // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/go-redis/redis v6.15.7+incompatible
+	github.com/go-redis/redis/v7 v7.2.0 // indirect
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0
 	github.com/rs/zerolog v1.18.0

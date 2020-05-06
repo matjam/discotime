@@ -53,7 +53,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var command string
 	var reply *discordgo.MessageEmbed
 
-	sublogger := log.With().Str("channel_id", m.ChannelID).Str("username", m.Author.Username).Str("content", m.Content).Logger()
+	userID := fmt.Sprintf("%v#%v", m.Author.Username, m.Author.Discriminator)
+
+	sublogger := log.With().Str("channel_id", m.ChannelID).Str("user_id", userID).Str("content", m.Content).Logger()
 
 	channel, err := s.Channel(m.ChannelID)
 	if err != nil {
