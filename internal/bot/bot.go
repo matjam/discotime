@@ -98,6 +98,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		command = strings.ToLower(args[0])
 	}
 
+	if len(args) > 1 {
+		args = args[1:]
+	}
+
 	sublogger.Info().Msgf("processing command")
 	ctx := discordContext{
 		session:   s,
@@ -111,17 +115,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case "help":
 		ctx.reply("")
 	case "time":
-		ctx.getTime()
-	case "localtime":
-		if len(args) < 1 {
-			ctx.reply("you need to provide something for me to work with here")
-		}
-		ctx.localTime(args[1:])
+		ctx.getTime(args)
 	case "set":
-		if len(args) < 1 {
-			ctx.reply("Sorry, you need to provide a timezone.")
-		}
-		ctx.setTimezone(args[1:])
+		ctx.setTimezone(args)
 	case "get":
 		ctx.show()
 	case "convert":
@@ -166,32 +162,11 @@ func (ctx *discordContext) show() {
 	ctx.reply("Sorry, I don't have any configured timezone for you. Try `set`.")
 }
 
-func (ctx *discordContext) getTime() {
-	location := cache.GetUserLocation(ctx.userID)
-	if location == nil {
-		ctx.reply("Sorry, I don't have any configured timezone for you. Try `set`.")
-		return
+func (ctx *discordContext) getTime(args []string) {
+	if len(args) == 0 {
+		ctx.reply("you need to provide something for me to work with here, like a date.")
 	}
 
-	now := time.Now()
-	ctx.reply(fmt.Sprintf("UTC time is %v\n", now.Format(format)))
-	ctx.reply(fmt.Sprintf("LOCAL time is %v", now.In(location).Format(format)))
-}
-
-func (ctx *discordContext) reply(message string) {
-	mention := ctx.user.Mention()
-	msg := fmt.Sprintf("%v %v", mention, message)
-	_, err := ctx.session.ChannelMessageSend(ctx.channelID, msg)
-	if err != nil {
-		ctx.log().Error().Msgf("error sending message to Discord: %v", err.Error())
-	}
-}
-
-func (ctx *discordContext) log() *zerolog.Logger {
-	return ctx.logCtx
-}
-
-func (ctx *discordContext) localTime(args []string) {
 	w := when.New(nil)
 	w.Add(en.All...)
 	w.Add(common.All...)
@@ -203,34 +178,13 @@ func (ctx *discordContext) localTime(args []string) {
 	}
 
 	timeString := strings.Join(args[:], " ")
-	// Try the strictest parser first
-	r, err := dateparse.ParseStrict(timeString)
-	if err == nil {
-		ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Format(format)))
-		ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.In(location).Format(format)))
-		return
-	}
-	ctx.log().Error().Msgf("dateparse parse error: %v", err.Error())
 
-	r, err = naturaldate.Parse(timeString, time.Now())
-	if err == nil {
-		ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Format(format)))
-		ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.In(location).Format(format)))
-		return
-	}
-	ctx.log().Error().Msgf("naturaldate parse error: %v", err.Error())
+	date := ctx.parseDate(timeString)
+	if date != nil {
+		ctx.reply(fmt.Sprintf("UTC time %v\n", date.Format(format)))
+		ctx.reply(fmt.Sprintf("LOCAL time %v", date.In(location).Format(format)))
 
-	wr, err := w.Parse(timeString, time.Now())
-	if wr != nil && err == nil {
-		r = wr.Time
-		ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Format(format)))
-		ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.In(location).Format(format)))
-		return
 	}
-
-	ctx.reply("Sorry, I didn't understand that time/date. I really tried. " +
-		"Maybe use something I can understand, like `YYYY-MM-DD HH:MM` in 24 hour " +
-		"time? I can probably handle that.")
 }
 
 func (ctx *discordContext) parseDate(timeString string) *time.Time {
@@ -265,4 +219,17 @@ func (ctx *discordContext) parseDate(timeString string) *time.Time {
 		"time? I can probably handle that.")
 
 	return nil
+}
+
+func (ctx *discordContext) reply(message string) {
+	mention := ctx.user.Mention()
+	msg := fmt.Sprintf("%v %v", mention, message)
+	_, err := ctx.session.ChannelMessageSend(ctx.channelID, msg)
+	if err != nil {
+		ctx.log().Error().Msgf("error sending message to Discord: %v", err.Error())
+	}
+}
+
+func (ctx *discordContext) log() *zerolog.Logger {
+	return ctx.logCtx
 }
