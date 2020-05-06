@@ -61,6 +61,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		sublogger.Error().Msgf("unable to get channel: %v", err.Error())
 	}
 
+	user, err := s.User(m.Author.ID)
+	if err != nil {
+		sublogger.Error().Msgf("unable to get user: %v", err.Error())
+
+	}
+
 	// We only handle messages from channels and DMs.
 	if channel.Type != discordgo.ChannelTypeDM && channel.Type != discordgo.ChannelTypeGuildText {
 		return
@@ -91,7 +97,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	sublogger.Info().Msgf("processing command")
 	ctx := discordContext{
 		session:   s,
-		user:      m.Member.User,
+		user:      user,
 		userID:    userID,
 		channelID: m.ChannelID,
 		logCtx:    &sublogger,
