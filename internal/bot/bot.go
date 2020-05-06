@@ -9,8 +9,7 @@ import (
 	"time"
 
 	"github.com/matjam/discotime/internal/cache"
-	"github.com/olebedev/when"
-	"github.com/olebedev/when/rules/en"
+	naturaldate "github.com/tj/go-naturaldate"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog"
@@ -196,20 +195,13 @@ func (ctx *discordContext) localTime(args []string) {
 		return
 	}
 
-	w := when.New(nil)
-	w.Add(en.All...)
-
 	timeString := strings.Join(args[:], " ")
-	r, err := w.Parse(timeString, time.Now())
+	r, err := naturaldate.Parse(timeString, time.Now())
 	if err != nil {
 		ctx.reply(fmt.Sprintf("Sorry, I didn't understand that time/date: %v", err.Error()))
 		return
 	}
-	if r == nil {
-		ctx.reply("Sorry, I didn't find anything that looks like a time/date")
-		return
-	}
 
-	ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Time.Format(format)))
-	ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.Time.In(location).Format(format)))
+	ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Format(format)))
+	ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.In(location).Format(format)))
 }

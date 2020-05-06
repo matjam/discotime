@@ -102,15 +102,29 @@ tzbit: I will remind you at 8:30am on Wednesday, 06 May 2020 PDT (UTC-0700)
 
 ## Natural Language Dates
 
-In order to try and be more user friendly, we try to parse the date/time provided using https://github.com/olebedev/when
+In order to try and be more user friendly, we try to parse the date/time provided using https://github.com/tj/go-naturaldate
 
 For example, the following should be possible:
 
-* tonight at 11:10 pm
-* at Friday afternoon
-* next tuesday 14:00
-* next wednesday at 2:25 p.m
-* 11 am past tuesday
+* now
+* today
+* yesterday
+* 5 minutes ago
+* three days ago
+* last month
+* next month
+* one year from now
+* yesterday at 10am
+* last sunday at 5:30pm
+* sunday at 22:45
+* next January
+* last February
+* December 25th at 7:30am
+* 10am
+* 10:05pm
+* 10:05:22pm
+* 5 days from now
+* 25th of December at 7:30am
 
 # Adding the bot to my server
 
