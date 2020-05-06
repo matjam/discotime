@@ -10,7 +10,6 @@ import (
 
 	"github.com/matjam/discotime/internal/cache"
 
-	embed "github.com/Clinet/discordgo-embed"
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -46,15 +45,12 @@ func Run(token string) {
 
 }
 
-var notImplementedEmbed = embed.NewGenericEmbed("Not Implemented", "```\nnot yet implemented.\n```")
-
 const format = "**3:04pm** on **Monday, 02 January 2006** (UTC-0700)"
 
 // This function will be called (due to AddHandler above) every time a new
 // message is created on any channel that the autenticated bot has access to.
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var command string
-	var reply *discordgo.MessageEmbed
 
 	userID := fmt.Sprintf("%v#%v", m.Author.Username, m.Author.Discriminator)
 
@@ -102,31 +98,24 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	switch command {
 	case "help":
-		reply = notImplementedEmbed
+		//
 	case "time":
 		var b strings.Builder
-
 		now := time.Now()
 		local, _ := time.LoadLocation("America/Los_Angeles")
 		fmt.Fprintf(&b, "The current UTC time is %v\n", now.Format(format))
 		fmt.Fprintf(&b, "Your current LOCAL time is %v", now.In(local).Format(format))
-
-		reply = embed.NewEmbed().SetDescription(b.String()).MessageEmbed
+		ctx.reply(b.String())
 	case "localtime":
-		reply = notImplementedEmbed
+		//
 	case "set":
 		ctx.setTimezone(args[1:])
 	case "get":
 		ctx.show()
 	case "convert":
-		reply = notImplementedEmbed
+		//
 	case "remindme":
-		reply = notImplementedEmbed
-	}
-
-	// only send the message if we have one to send
-	if reply != nil {
-		s.ChannelMessageSendEmbed(m.ChannelID, reply)
+		//
 	}
 
 	// We ignore messages that aren't proper commands as they may be for another bot
@@ -148,6 +137,7 @@ func (ctx *discordContext) setTimezone(args []string) {
 	location, err := time.LoadLocation(args[0])
 	if err != nil {
 		ctx.log().Error().Msgf("couldn't parse timezone [%v]: %v", args[0], err.Error())
+		ctx.reply(fmt.Sprintf("Sorry, *%v* is not a valid timezone string.", args[0]))
 	}
 	cache.SetUserLocation(ctx.userID, location)
 }
@@ -163,8 +153,7 @@ func (ctx *discordContext) show() {
 }
 
 func (ctx *discordContext) reply(message string) {
-	reply := embed.NewEmbed().SetDescription(message).MessageEmbed
-	_, err := ctx.session.ChannelMessageSendEmbed(ctx.channelID, reply)
+	_, err := ctx.session.ChannelMessageSend(ctx.channelID, message)
 	if err != nil {
 		ctx.log().Error().Msgf("error sending message to Discord: %v", err.Error())
 	}
