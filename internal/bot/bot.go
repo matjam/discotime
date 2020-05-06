@@ -147,7 +147,7 @@ func (ctx *discordContext) setTimezone(args []string) {
 	ctx.log().Info().Msgf("handling set request: %v", args)
 	location, err := time.LoadLocation(args[0])
 	if err != nil {
-		ctx.log().Error().Msgf("couldn't parse timezone [%v]: %v", args[1], err.Error())
+		ctx.log().Error().Msgf("couldn't parse timezone [%v]: %v", args[0], err.Error())
 	}
 	cache.SetUserLocation(ctx.userID, location)
 }
