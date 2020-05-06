@@ -126,7 +126,7 @@ For example, the following should be possible:
 * 5 days from now
 * 25th of December at 7:30am
 
-# Adding the bot to my server
+# Adding the bot to your Discord server
 
 If you want this bot in your Discord server, please click [here](https://discord.com/api/oauth2/authorize?client_id=707063041547829279&permissions=388160&scope=bot).
 
