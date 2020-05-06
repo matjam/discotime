@@ -140,6 +140,7 @@ func (ctx *discordContext) setTimezone(args []string) {
 		ctx.reply(fmt.Sprintf("Sorry, *%v* is not a valid timezone string.", args[0]))
 	}
 	cache.SetUserLocation(ctx.userID, location)
+	ctx.reply(fmt.Sprintf("Okay, your local timezone has been set to **%v**.", location.String()))
 }
 
 func (ctx *discordContext) show() {
