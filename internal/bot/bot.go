@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/matjam/discotime/internal/cache"
+	"github.com/olebedev/when"
+	"github.com/olebedev/when/rules/en"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/rs/zerolog"
@@ -109,8 +111,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case "time":
 		ctx.getTime()
 	case "localtime":
-		//
+		if len(args) < 1 {
+			ctx.reply("you need to provide something for me to work with here")
+		}
+		ctx.localTime(args[1:])
 	case "set":
+		if len(args) < 1 {
+			ctx.reply("Sorry, you need to provide a timezone.")
+		}
 		ctx.setTimezone(args[1:])
 	case "get":
 		ctx.show()
@@ -179,4 +187,29 @@ func (ctx *discordContext) reply(message string) {
 
 func (ctx *discordContext) log() *zerolog.Logger {
 	return ctx.logCtx
+}
+
+func (ctx *discordContext) localTime(args []string) {
+	location := cache.GetUserLocation(ctx.userID)
+	if location == nil {
+		ctx.reply("Sorry, I don't have any configured timezone for you. Try `set`.")
+		return
+	}
+
+	w := when.New(nil)
+	w.Add(en.All...)
+
+	timeString := strings.Join(args[:], " ")
+	r, err := w.Parse(timeString, time.Now())
+	if err != nil {
+		ctx.reply(fmt.Sprintf("Sorry, I didn't understand that time/date: %v", err.Error()))
+		return
+	}
+	if r == nil {
+		ctx.reply("Sorry, I didn't find anything that looks like a time/date")
+		return
+	}
+
+	ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Time.Format(format)))
+	ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.Time.In(location).Format(format)))
 }
