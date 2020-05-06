@@ -165,8 +165,9 @@ func (ctx *discordContext) getTime() {
 
 	now := time.Now()
 	local, _ := time.LoadLocation("America/Los_Angeles")
-	ctx.reply(fmt.Sprintf("`  UTC time is %v`\n", now.Format(format)))
-	ctx.reply(fmt.Sprintf("`LOCAL time is %v`", now.In(local).Format(format)))
+	ctx.reply("Here's the current time for UTC and your local time:")
+	ctx.reply(fmt.Sprintf("UTC time is %v\n", now.Format(format)))
+	ctx.reply(fmt.Sprintf("LOCAL time is %v", now.In(local).Format(format)))
 }
 
 func (ctx *discordContext) reply(message string) {
