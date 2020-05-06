@@ -52,9 +52,9 @@ tzbot: That time is 3:54pm on Tuesday, 05 May 2020 UTC (UTC+0000)
 tzbot: Local time is 8:54am on Tuesday, 05 May 2020 PDT (UTC-0700)
 ```
 
-You can find a list of supported abbreviations here: https://github.com/tkuchiki/go-timezone/blob/master/timezone.go#L9
+You can find a list of supported abbreviations here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-Please note that these abbreviations have limitations. PST could mean "Pacific Standard Time" or "Philippines Standard Time" - though in this case we'll assume Pacific; you're better off using accurate timezones definitions as below.
+Please note that these abbreviations have limitations. PST could mean "Pacific Standard Time" or "Philippines Standard Time", so I recommend you use the ones that are more specific.
 
 You can use offsets:
 

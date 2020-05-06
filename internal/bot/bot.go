@@ -8,8 +8,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/matjam/discotime/internal/cache"
+
 	embed "github.com/Clinet/discordgo-embed"
 	"github.com/bwmarrin/discordgo"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -90,6 +93,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	sublogger.Info().Msgf("processing command")
+	ctx := discordContext{
+		session:   s,
+		userID:    userID,
+		channelID: m.ChannelID,
+		logCtx:    &sublogger,
+	}
 
 	switch command {
 	case "help":
@@ -106,7 +115,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case "localtime":
 		reply = notImplementedEmbed
 	case "set":
-		reply = notImplementedEmbed
+		ctx.setTimezone(args[1:])
+	case "get":
+		ctx.show()
 	case "convert":
 		reply = notImplementedEmbed
 	case "remindme":
@@ -121,6 +132,44 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// We ignore messages that aren't proper commands as they may be for another bot
 }
 
-func setTimezone() {
+type discordContext struct {
+	session   *discordgo.Session
+	userID    string
+	channelID string
+	logCtx    *zerolog.Logger
+}
 
+func (ctx *discordContext) setTimezone(args []string) {
+	if len(args) == 0 {
+		ctx.reply("`set` requires you to provide a timezone argument.")
+		return
+	}
+	ctx.log().Info().Msgf("handling set request: %v", args)
+	location, err := time.LoadLocation(args[0])
+	if err != nil {
+		ctx.log().Error().Msgf("couldn't parse timezone [%v]: %v", args[1], err.Error())
+	}
+	cache.SetUserLocation(ctx.userID, location)
+}
+
+func (ctx *discordContext) show() {
+	location := cache.GetUserLocation(ctx.userID)
+	if location != nil {
+		ctx.reply(fmt.Sprintf("Currently configured timezone is **%v**", location.String()))
+		return
+	}
+
+	ctx.reply("Sorry, I don't have any configured timezone for you. Try `set`.")
+}
+
+func (ctx *discordContext) reply(message string) {
+	reply := embed.NewEmbed().SetDescription(message).MessageEmbed
+	_, err := ctx.session.ChannelMessageSendEmbed(ctx.channelID, reply)
+	if err != nil {
+		ctx.log().Error().Msgf("error sending message to Discord: %v", err.Error())
+	}
+}
+
+func (ctx *discordContext) log() *zerolog.Logger {
+	return ctx.logCtx
 }

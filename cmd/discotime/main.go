@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/matjam/discotime/internal/bot"
+	"github.com/matjam/discotime/internal/cache"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -44,7 +45,9 @@ func main() {
 	port := os.Getenv("PORT")
 	token := os.Getenv("DISCORD_AUTH")
 
+	// Initialize some global stuff
 	initLogging()
+	cache.InitCache()
 
 	// Echo instance
 	e := echo.New()
