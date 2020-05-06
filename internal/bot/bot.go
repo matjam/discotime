@@ -203,21 +203,22 @@ func (ctx *discordContext) localTime(args []string) {
 	}
 
 	timeString := strings.Join(args[:], " ")
-	r, err := naturaldate.Parse(timeString, time.Now())
-	if err == nil {
-		ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Format(format)))
-		ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.In(location).Format(format)))
-		return
-	}
-	ctx.log().Error().Msgf("naturaldate parse error: %v", err.Error())
-
-	r, err = dateparse.ParseStrict(timeString)
+	// Try the strictest parser first
+	r, err := dateparse.ParseStrict(timeString)
 	if err == nil {
 		ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Format(format)))
 		ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.In(location).Format(format)))
 		return
 	}
 	ctx.log().Error().Msgf("dateparse parse error: %v", err.Error())
+
+	r, err = naturaldate.Parse(timeString, time.Now())
+	if err == nil {
+		ctx.reply(fmt.Sprintf("UTC time will be %v\n", r.Format(format)))
+		ctx.reply(fmt.Sprintf("LOCAL time will be %v", r.In(location).Format(format)))
+		return
+	}
+	ctx.log().Error().Msgf("naturaldate parse error: %v", err.Error())
 
 	wr, err := w.Parse(timeString, time.Now())
 	if err == nil {
