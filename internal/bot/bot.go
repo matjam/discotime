@@ -105,14 +105,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	switch command {
 	case "help":
-		//
+		ctx.reply("")
 	case "time":
-		var b strings.Builder
-		now := time.Now()
-		local, _ := time.LoadLocation("America/Los_Angeles")
-		fmt.Fprintf(&b, "The current UTC time is %v\n", now.Format(format))
-		fmt.Fprintf(&b, "Your current LOCAL time is %v", now.In(local).Format(format))
-		ctx.reply(b.String())
+		ctx.getTime()
 	case "localtime":
 		//
 	case "set":
@@ -170,8 +165,8 @@ func (ctx *discordContext) getTime() {
 
 	now := time.Now()
 	local, _ := time.LoadLocation("America/Los_Angeles")
-	ctx.reply(fmt.Sprintf("The current UTC time is %v\n", now.Format(format)))
-	ctx.reply(fmt.Sprintf("Your current LOCAL time is %v", now.In(local).Format(format)))
+	ctx.reply(fmt.Sprintf("`  UTC time is %v`\n", now.Format(format)))
+	ctx.reply(fmt.Sprintf("`LOCAL time is %v`", now.In(local).Format(format)))
 }
 
 func (ctx *discordContext) reply(message string) {
