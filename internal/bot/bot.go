@@ -153,8 +153,22 @@ func (ctx *discordContext) show() {
 	ctx.reply("Sorry, I don't have any configured timezone for you. Try `set`.")
 }
 
+func (ctx *discordContext) getTime() {
+	location := cache.GetUserLocation(ctx.userID)
+	if location == nil {
+		ctx.reply("Sorry, I don't have any configured timezone for you. Try `set`.")
+		return
+	}
+
+	now := time.Now()
+	local, _ := time.LoadLocation("America/Los_Angeles")
+	ctx.reply(fmt.Sprintf("The current UTC time is %v\n", now.Format(format)))
+	ctx.reply(fmt.Sprintf("Your current LOCAL time is %v", now.In(local).Format(format)))
+}
+
 func (ctx *discordContext) reply(message string) {
-	_, err := ctx.session.ChannelMessageSend(ctx.channelID, message)
+	msg := fmt.Sprintf("@%v %v", ctx.userID, message)
+	_, err := ctx.session.ChannelMessageSend(ctx.channelID, msg)
 	if err != nil {
 		ctx.log().Error().Msgf("error sending message to Discord: %v", err.Error())
 	}
