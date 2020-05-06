@@ -232,3 +232,37 @@ func (ctx *discordContext) localTime(args []string) {
 		"Maybe use something I can understand, like `YYYY-MM-DD HH:MM` in 24 hour " +
 		"time? I can probably handle that.")
 }
+
+func (ctx *discordContext) parseDate(timeString string) *time.Time {
+	w := when.New(nil)
+	w.Add(en.All...)
+	w.Add(common.All...)
+
+	location := cache.GetUserLocation(ctx.userID)
+	if location == nil {
+		ctx.reply("Sorry, I don't have any configured timezone for you. Try `set`.")
+		return nil
+	}
+
+	// Try the strictest parser first
+	r, err := dateparse.ParseStrict(timeString)
+	if err == nil {
+		return &r
+	}
+
+	r, err = naturaldate.Parse(timeString, time.Now())
+	if err == nil {
+		return &r
+	}
+
+	wr, err := w.Parse(timeString, time.Now())
+	if wr != nil && err == nil {
+		return &wr.Time
+	}
+
+	ctx.reply("Sorry, I didn't understand that time/date. I really tried. " +
+		"Maybe use something I can understand, like `YYYY-MM-DD HH:MM` in 24 hour " +
+		"time? I can probably handle that.")
+
+	return nil
+}
