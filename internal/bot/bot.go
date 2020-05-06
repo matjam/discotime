@@ -39,14 +39,17 @@ func Run(token string) {
 		return
 	}
 
-	log.Info().Msg("Bot is now running.")
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	<-sc
+	for {
+		log.Info().Msg("discord session opened")
+		sc := make(chan os.Signal, 1)
+		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+		<-sc
 
-	// Cleanly close down the Discord session.
-	dg.Close()
+		// Cleanly close down the Discord session.
+		dg.Close()
 
+		log.Info().Msg("discord session closed. Reconnecting ...")
+	}
 }
 
 const format = "**3:04pm** on **Monday, 02 January 2006** (UTC-0700)"
@@ -147,6 +150,7 @@ func (ctx *discordContext) setTimezone(args []string) {
 	if err != nil {
 		ctx.log().Error().Msgf("couldn't parse timezone [%v]: %v", args[0], err.Error())
 		ctx.reply(fmt.Sprintf("Sorry, *%v* is not a valid timezone string.", args[0]))
+		return
 	}
 	cache.SetUserLocation(ctx.userID, location)
 	ctx.reply(fmt.Sprintf("Okay, your local timezone has been set to **%v**.", location.String()))
@@ -185,6 +189,19 @@ func (ctx *discordContext) getTime(args []string) {
 		ctx.reply(fmt.Sprintf("LOCAL time %v", date.In(location).Format(format)))
 
 	}
+}
+
+func (ctx *discordContext) getHelp() {
+	tq := "```"
+	help := tq + `This bot is designed to help you with figuring out what local time something
+	is compared to UTC.
+
+	Commands:
+
+	   time [datetime] - Gets the given time (or now) in UTC time. For example,
+	` + tq
+
+	ctx.reply(help)
 }
 
 func (ctx *discordContext) parseDate(timeString string) *time.Time {
@@ -232,4 +249,8 @@ func (ctx *discordContext) reply(message string) {
 
 func (ctx *discordContext) log() *zerolog.Logger {
 	return ctx.logCtx
+}
+
+func (ctx *discordContext) privateReply(message string) {
+
 }
